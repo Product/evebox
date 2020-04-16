@@ -5,7 +5,7 @@ set -e
 IMAGE="evebox/builder:latest"
 
 docker_build() {
-    docker build ${CACHE_FROM} --rm \
+    docker build ${CACHE_FROM} \
 	   -t ${IMAGE} \
 	   -f ${DOCKERFILE} .
 }
@@ -45,6 +45,7 @@ docker_run() {
 
 release() {
     DOCKERFILE="./docker/builder/Dockerfile"
+    IMAGE="evebox/builder:linux"
     docker_build
     docker_run "make install-deps dist rpm deb"
 }

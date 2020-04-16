@@ -1,39 +1,102 @@
-release:
+# release:
+#   image: docker:stable
+#   variables:
+#     BUILD_IMAGE: registry.gitlab.com/$CI_PROJECT_PATH:builder
+#     MACOS_BUILD_IMAGE: registry.gitlab.com/$CI_PROJECT_PATH:macos
+#     DOCKER_HOST: tcp://docker:2375
+#     DOCKER_DRIVER: overlay2
+#   services:
+#     - docker:dind
+
+#   script:
+#     - |
+#       docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+#       docker pull ${BUILD_IMAGE} || true
+
+#       export CACHE_FROM="--cache-from ${BUILD_IMAGE}"
+#       ./docker.sh release
+#       docker tag evebox/builder:latest ${BUILD_IMAGE}
+#       tar zcvf resources-public.tar.gz ./resources/public
+#       ./docker.sh release-windows
+#       docker push ${BUILD_IMAGE}
+      
+#       docker pull ${MACOS_BUILD_IMAGE} || true
+#       export CACHE_FROM="--cache-from ${MACOS_BUILD_IMAGE}"
+#       ./docker.sh release-macos
+#       docker tag evebox/builder:macos ${MACOS_BUILD_IMAGE}
+#       docker push ${MACOS_BUILD_IMAGE}
+      
+#       mv dist/* .
+      
+#     # Generate checksums.
+#     - apk add openssl
+#     - openssl sha256 *.tar.gz *.zip *.rpm *.deb > CHECKSUMS.txt
+
+#   artifacts:
+#     paths:
+#       - "*.zip"
+#       - "*.rpm"
+#       - "*.deb"
+#       - "CHECKSUMS.txt"
+#       - "resources-public.tar.gz"
+
+linux-build:
   image: docker:stable
   variables:
-    BUILD_IMAGE: registry.gitlab.com/$CI_PROJECT_PATH:builder
-    MACOS_BUILD_IMAGE: registry.gitlab.com/$CI_PROJECT_PATH:macos
+    BUILD_IMAGE: registry.gitlab.com/$CI_PROJECT_PATH:linux
     DOCKER_HOST: tcp://docker:2375
     DOCKER_DRIVER: overlay2
   services:
     - docker:dind
-
   script:
     - |
       docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
       docker pull ${BUILD_IMAGE} || true
-
       export CACHE_FROM="--cache-from ${BUILD_IMAGE}"
       ./docker.sh release
-      tar zcvf resources-public.tar.gz ./resources/public
-      ./docker.sh release-windows
+      docker tag evebox/builder:linux ${BUILD_IMAGE}
       docker push ${BUILD_IMAGE}
-      
-      docker pull ${MACOS_BUILD_IMAGE} || true
-      export CACHE_FROM="--cache-from ${MACOS_BUILD_IMAGE}"
-      ./docker.sh release-macos
-      docker push ${MACOS_BUILD_IMAGE}
-      
-      mv dist/* .
-      
-    # Generate checksums.
-    - apk add openssl
-    - openssl sha256 *.tar.gz *.zip *.rpm *.deb > CHECKSUMS.txt
-
   artifacts:
     paths:
-      - "*.zip"
-      - "*.rpm"
-      - "*.deb"
-      - "CHECKSUMS.txt"
-      - "resources-public.tar.gz"
+      - "dist/*.zip"
+
+macos-build:
+  image: docker:stable
+  variables:
+    BUILD_IMAGE: registry.gitlab.com/$CI_PROJECT_PATH:macos
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_DRIVER: overlay2
+  services:
+    - docker:dind
+  script:
+    - |
+      docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+      docker pull ${BUILD_IMAGE} || true
+      export CACHE_FROM="--cache-from ${BUILD_IMAGE}"
+      ./docker.sh release-macos
+      docker tag evebox/builder:macos ${BUILD_IMAGE}
+      docker push ${BUILD_IMAGE}
+  artifacts:
+    paths:
+      - "dist/*.zip"
+
+windows-build:
+  image: docker:stable
+  variables:
+    BUILD_IMAGE: registry.gitlab.com/$CI_PROJECT_PATH:windows
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_DRIVER: overlay2
+  services:
+    - docker:dind
+  script:
+    - |
+      docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+      docker pull ${BUILD_IMAGE} || true
+      export CACHE_FROM="--cache-from ${BUILD_IMAGE}"
+      ./docker.sh release-windows
+      docker tag evebox/builder:windows ${BUILD_IMAGE}
+      docker push ${BUILD_IMAGE}
+  artifacts:
+    paths:
+      - "dist/*.zip"
+      
