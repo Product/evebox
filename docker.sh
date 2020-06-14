@@ -5,6 +5,10 @@ set -e
 BUILD_REV=$(git rev-parse --short HEAD)
 export BUILD_REV
 
+if test -t 1; then
+    IT="-it"
+fi
+
 webapp() {
     DOCKERFILE="./docker/builder/Dockerfile"
     TAG="evebox/builder:linux"
@@ -30,7 +34,7 @@ release_musl() {
            --build-arg REAL_GID="$(id -g)" \
 	   -t ${TAG} \
 	   -f ${DOCKERFILE} .
-    docker run ${IT} --rm \
+    exec docker run ${IT} --rm \
            -v "$(pwd):/src" \
            -v "$HOME/.cargo:/home/builder/.cargo" \
            -w /src \
@@ -85,11 +89,7 @@ case "$1" in
         webapp
         ;;
 
-    release|release-linux|release-musl)
-	release_musl
-	;;
-
-    release-musl)
+    release-linux)
 	release_musl
 	;;
 

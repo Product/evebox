@@ -44,15 +44,12 @@ jobs:
         with:
           path: dist/*.rpm
 
-  arm:
-    name: Arm
+  arm7:
+    name: Arm 7
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain stable -y
-      - run: echo "::add-path::$HOME/.cargo/bin"
-      - run: cargo install cross
-      - run: CARGO=cross TARGET=armv7-unknown-linux-musleabihf make dist
+      - run: ./build.sh release-arm7
       - uses: actions/upload-artifact@v2
         with:
           path: dist/*.zip
