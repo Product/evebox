@@ -1,7 +1,0 @@
-FROM scratch
-
-ENV EVEBOX_HTTP_HOST=0.0.0.0
-
-COPY dist/evebox-latest-linux-arm/evebox /evebox
-
-CMD ["/evebox"]
